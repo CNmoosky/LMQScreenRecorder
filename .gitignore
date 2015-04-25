@@ -1,0 +1,10 @@
+##### gitignore files config ########
+.DS_Store
+.DS_Store?
+*.DS_Store?
+xcuserdata
+*.xcuserstate
+*.xcscmblueprint
+.xcscmblueprint
+build
+products

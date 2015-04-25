@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 47;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -11,8 +11,8 @@
 		B373850E1AEB65A0006E432F /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B373850D1AEB65A0006E432F /* ViewController.m */; };
 		B37385111AEB65A0006E432F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B373850F1AEB65A0006E432F /* Main.storyboard */; };
 		B37385131AEB65A1006E432F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B37385121AEB65A1006E432F /* Assets.xcassets */; };
-		B37385161AEB65A1006E432F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B37385141AEB65A1006E432F /* LaunchScreen.storyboard */; };
 		B37385191AEB65A1006E432F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B37385181AEB65A1006E432F /* main.m */; };
+		B388A91B1AEB685600BF78D6 /* LMQScreenRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = B388A91A1AEB685600BF78D6 /* LMQScreenRecorder.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,9 +23,10 @@
 		B373850D1AEB65A0006E432F /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		B37385101AEB65A0006E432F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B37385121AEB65A1006E432F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		B37385151AEB65A1006E432F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B37385171AEB65A1006E432F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B37385181AEB65A1006E432F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		B388A9191AEB685600BF78D6 /* LMQScreenRecorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LMQScreenRecorder.h; sourceTree = "<group>"; };
+		B388A91A1AEB685600BF78D6 /* LMQScreenRecorder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LMQScreenRecorder.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,15 +59,24 @@
 		B37385081AEB65A0006E432F /* LMQScreenRecorder */ = {
 			isa = PBXGroup;
 			children = (
+				B388A9181AEB684C00BF78D6 /* LMQScreenRecorder */,
 				B37385091AEB65A0006E432F /* AppDelegate.h */,
 				B373850A1AEB65A0006E432F /* AppDelegate.m */,
 				B373850C1AEB65A0006E432F /* ViewController.h */,
 				B373850D1AEB65A0006E432F /* ViewController.m */,
 				B373850F1AEB65A0006E432F /* Main.storyboard */,
 				B37385121AEB65A1006E432F /* Assets.xcassets */,
-				B37385141AEB65A1006E432F /* LaunchScreen.storyboard */,
 				B37385171AEB65A1006E432F /* Info.plist */,
 				B37385181AEB65A1006E432F /* main.m */,
+			);
+			path = LMQScreenRecorder;
+			sourceTree = "<group>";
+		};
+		B388A9181AEB684C00BF78D6 /* LMQScreenRecorder */ = {
+			isa = PBXGroup;
+			children = (
+				B388A9191AEB685600BF78D6 /* LMQScreenRecorder.h */,
+				B388A91A1AEB685600BF78D6 /* LMQScreenRecorder.m */,
 			);
 			path = LMQScreenRecorder;
 			sourceTree = "<group>";
@@ -102,11 +112,12 @@
 				TargetAttributes = {
 					B37385051AEB65A0006E432F = {
 						CreatedOnToolsVersion = 10.3;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
 			buildConfigurationList = B37385011AEB65A0006E432F /* Build configuration list for PBXProject "LMQScreenRecorder" */;
-			compatibilityVersion = "Xcode 9.3";
+			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -128,7 +139,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B37385161AEB65A1006E432F /* LaunchScreen.storyboard in Resources */,
 				B37385131AEB65A1006E432F /* Assets.xcassets in Resources */,
 				B37385111AEB65A0006E432F /* Main.storyboard in Resources */,
 			);
@@ -143,6 +153,7 @@
 			files = (
 				B373850E1AEB65A0006E432F /* ViewController.m in Sources */,
 				B37385191AEB65A1006E432F /* main.m in Sources */,
+				B388A91B1AEB685600BF78D6 /* LMQScreenRecorder.m in Sources */,
 				B373850B1AEB65A0006E432F /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -156,14 +167,6 @@
 				B37385101AEB65A0006E432F /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		B37385141AEB65A1006E432F /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				B37385151AEB65A1006E432F /* Base */,
-			);
-			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -220,7 +223,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -273,7 +276,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -285,15 +288,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = CY2Y7Z7G9M;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = LMQScreenRecorder/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.qinastudio.LMQScreenRecorder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -302,15 +305,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = CY2Y7Z7G9M;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = LMQScreenRecorder/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.qinastudio.LMQScreenRecorder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
