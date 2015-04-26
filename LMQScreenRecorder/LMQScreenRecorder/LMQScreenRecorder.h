@@ -25,10 +25,26 @@ typedef enum : NSUInteger {
 
 @property(nonatomic,assign,readonly)LMQScreenRecorderState state;
 
+/**
+ 初始化
+
+ @param option 录屏选项设置
+ @return recorder 对象
+ */
 + (instancetype)recorderWithOption:(LMQScreenRecorderOption *)option;
 
+/**
+ 开始录屏
+
+ @param view 需要录制的视图
+ */
 - (void)startRecordView:(UIView *)view;
 
+/**
+ 停止录屏
+
+ @param completionBlock 停止录屏回调
+ */
 - (void)stopRecordingWithCompletion:(LMQLMQScreenRecordCompletionBlock)completionBlock;
 
 @end
