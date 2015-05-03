@@ -13,6 +13,7 @@
 		B37385131AEB65A1006E432F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B37385121AEB65A1006E432F /* Assets.xcassets */; };
 		B37385191AEB65A1006E432F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B37385181AEB65A1006E432F /* main.m */; };
 		B388A91B1AEB685600BF78D6 /* LMQScreenRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = B388A91A1AEB685600BF78D6 /* LMQScreenRecorder.m */; };
+		B3AE5F151AF63CF6006FFAE3 /* baby.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B3AE5F141AF63CF6006FFAE3 /* baby.m4a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		B37385181AEB65A1006E432F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B388A9191AEB685600BF78D6 /* LMQScreenRecorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LMQScreenRecorder.h; sourceTree = "<group>"; };
 		B388A91A1AEB685600BF78D6 /* LMQScreenRecorder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LMQScreenRecorder.m; sourceTree = "<group>"; };
+		B3AE5F141AF63CF6006FFAE3 /* baby.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = baby.m4a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +61,7 @@
 		B37385081AEB65A0006E432F /* LMQScreenRecorder */ = {
 			isa = PBXGroup;
 			children = (
+				B3AE5F111AF6039F006FFAE3 /* Resource */,
 				B388A9181AEB684C00BF78D6 /* LMQScreenRecorder */,
 				B37385091AEB65A0006E432F /* AppDelegate.h */,
 				B373850A1AEB65A0006E432F /* AppDelegate.m */,
@@ -79,6 +82,14 @@
 				B388A91A1AEB685600BF78D6 /* LMQScreenRecorder.m */,
 			);
 			path = LMQScreenRecorder;
+			sourceTree = "<group>";
+		};
+		B3AE5F111AF6039F006FFAE3 /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+				B3AE5F141AF63CF6006FFAE3 /* baby.m4a */,
+			);
+			path = Resource;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -141,6 +152,7 @@
 			files = (
 				B37385131AEB65A1006E432F /* Assets.xcassets in Resources */,
 				B37385111AEB65A0006E432F /* Main.storyboard in Resources */,
+				B3AE5F151AF63CF6006FFAE3 /* baby.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

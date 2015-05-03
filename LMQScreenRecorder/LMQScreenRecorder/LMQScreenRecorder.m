@@ -30,10 +30,9 @@
 
 @property(nonatomic,strong)dispatch_queue_t render_queue;
 @property(nonatomic,strong)dispatch_queue_t append_pixelBuffer_queue;
-@property(nonatomic,strong)dispatch_semaphore_t semaphore;
 
 @property(nonatomic,strong)AVAssetWriter *videoWriter;
-@property(nonatomic,strong)AVAssetReader *audioReader;
+//@property(nonatomic,strong)AVAssetReader *audioReader;
 @property(nonatomic,strong)AVAssetWriterInput *videoWriterInput;
 @property(nonatomic,strong)AVAssetWriterInput *audioWriterInput;
 @property(nonatomic,strong)AVAssetWriterInputPixelBufferAdaptor *avAdaptor;
@@ -93,20 +92,19 @@
 
 - (void)stopRecord
 {
+    self.state = LMQScreenRecorderStateWriting;
     @weakify(self);
     dispatch_async(self.render_queue, ^{
         @strongify(self);
-        self.state = LMQScreenRecorderStateWriting;
+        dispatch_queue_t queue = self.append_pixelBuffer_queue;
         @weakify(self);
-        dispatch_async(self.append_pixelBuffer_queue, ^{
+        dispatch_async(queue, ^{
             @strongify(self);
             CFTimeInterval elapsed = [[NSDate date] timeIntervalSinceDate:self.startDate];
             CMTime time = CMTimeMakeWithSeconds(elapsed, 1000);
-            [self.videoWriterInput markAsFinished];
             @weakify(self);
-            [self addAudioreaderWith:elapsed and:^{
+            [self addAudioreaderWith:elapsed and:^(NSError *error){
                 @strongify(self);
-                [self.audioReader cancelReading];
                 [self.videoWriter endSessionAtSourceTime:time];
                 @weakify(self);
                 [self.videoWriter finishWritingWithCompletionHandler:^{
@@ -115,15 +113,21 @@
                     dispatch_async(dispatch_get_main_queue(), ^{
                         @strongify(self);
                         self.state = LMQScreenRecorderStateCompleted;
-                        NSURL *videoURL = self.videoWriter.outputURL;
-                        if (self.completionBlock) {
-                            self.completionBlock(YES,videoURL,nil);
+                        if (error) {
+                            [self errorWithError:error];
+                        }else{
+                            NSURL *videoURL = self.videoWriter.outputURL;
+                            if (self.completionBlock) {
+                                self.completionBlock(YES,videoURL,nil);
+                            }
                         }
                         self.state = LMQScreenRecorderStateDefault;
                         [self clean];
                     });
                 }];
             }];
+            [self.videoWriterInput markAsFinished];
+
         });
     });
 }
@@ -137,9 +141,7 @@
     }
     
     NSError* error = nil;
-    self.videoWriter = [[AVAssetWriter alloc] initWithURL:[NSURL fileURLWithPath:self.option.outputURL] ?: [self tempFileURL]
-                                             fileType:AVFileTypeMPEG4
-                                                error:&error];
+    self.videoWriter = [[AVAssetWriter alloc] initWithURL:[NSURL fileURLWithPath:self.option.outputURL] ?: [self tempFileURL] fileType:AVFileTypeMPEG4 error:&error];
     if (error) {
         [self errorWithError:error];
         self.videoWriter = nil;
@@ -151,7 +153,6 @@
     CGSize size = self.recodViewSize;
     CGFloat scale = self.scale;
     
-    
     NSInteger pixelNumber = size.width * size.height * scale;
     NSDictionary* videoCompression = @{AVVideoAverageBitRateKey:@(pixelNumber * 11.4)};
     NSDictionary* videoSettings = @{AVVideoCodecKey:AVVideoCodecH264,
@@ -159,12 +160,12 @@
                                     AVVideoHeightKey:[NSNumber numberWithInt:size.height * scale],
                                     AVVideoCompressionPropertiesKey:videoCompression};
     
-    _videoWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:videoSettings];
-    _videoWriterInput.expectsMediaDataInRealTime = YES;
+    self.videoWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:videoSettings];
+    self.videoWriterInput.expectsMediaDataInRealTime = YES;
     
-    _avAdaptor = [AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:_videoWriterInput sourcePixelBufferAttributes:nil];
+    self.avAdaptor = [AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:_videoWriterInput sourcePixelBufferAttributes:nil];
     
-    [_videoWriter addInput:_videoWriterInput];
+    [self.videoWriter addInput:self.videoWriterInput];
 }
 
 - (void)addAudioInput
@@ -173,28 +174,25 @@
         return;
     }
     
-    AVAssetWriterInput* audioWriterInput = nil;
-    CMFormatDescriptionRef audio_fmt_desc_ = nil;
     AudioStreamBasicDescription audioFormat;
     bzero(&audioFormat, sizeof(audioFormat));
     audioFormat.mSampleRate = 44100;
     audioFormat.mFormatID   = kAudioFormatMPEG4AAC;
     audioFormat.mFramesPerPacket = 1024;
     audioFormat.mChannelsPerFrame = 2;
+    
     int bytes_per_sample = sizeof(float);
     audioFormat.mFormatFlags = kAudioFormatFlagIsFloat | kAudioFormatFlagIsPacked;
-    
     audioFormat.mBitsPerChannel = bytes_per_sample * 8;
     audioFormat.mBytesPerPacket = bytes_per_sample * 2;
     audioFormat.mBytesPerFrame = bytes_per_sample * 2;
     
+    CMFormatDescriptionRef audio_fmt_desc_ = nil;
     CMAudioFormatDescriptionCreate(kCFAllocatorDefault,&audioFormat,0,NULL,0,NULL,NULL,&audio_fmt_desc_);
-    audioWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio outputSettings:nil sourceFormatHint:audio_fmt_desc_];
-    audioWriterInput.expectsMediaDataInRealTime = YES;
     
-    self.audioWriterInput = audioWriterInput;
-    [_videoWriter addInput:audioWriterInput];
-    
+    self.audioWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio outputSettings:nil sourceFormatHint:audio_fmt_desc_];
+    self.audioWriterInput.expectsMediaDataInRealTime = YES;
+    [self.videoWriter addInput:self.audioWriterInput];
 }
 
 
@@ -213,12 +211,11 @@
                 NSTimeInterval timeInterval = [[NSDate date] timeIntervalSinceDate:startDate];;
                 if (timeInterval - lastTime >= 1.0/self.option.maxFrame || lastTime == 0) {
                     lastTime = timeInterval ;
-                    dispatch_semaphore_wait(self.semaphore, DISPATCH_TIME_FOREVER);
                     
                     CVPixelBufferRef pixelBuffer = NULL;
                     CGContextRef bitmapContext = [self createPixelBufferAndBitmapContext:&pixelBuffer];
                     @weakify(self);
-                    dispatch_sync(dispatch_get_main_queue(), ^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
                         @strongify(self);
                         UIGraphicsPushContext(bitmapContext);
                         {
@@ -228,21 +225,19 @@
                         @weakify(self);
                         dispatch_async(self.append_pixelBuffer_queue, ^{
                             @strongify(self);
-                            LMQLog(@"录制");
-                            if (![self.videoWriterInput isReadyForMoreMediaData]){
-                                LMQLog(@"掉帧2");
-                            }else{
+                            if ([self.videoWriterInput isReadyForMoreMediaData]){
+                                LMQLog(@"录制");
                                 CMTime time = CMTimeMakeWithSeconds(timeInterval, 1000);
                                 BOOL success = [self.avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time];
                                 if (!success) {
                                     LMQLog(@"出错");
                                 }
+                            }else{
+                                LMQLog(@"----掉帧-----");
                             }
                             CGContextRelease(bitmapContext);
                             CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
                             CVPixelBufferRelease(pixelBuffer);
-                            
-                            dispatch_semaphore_signal(self.semaphore);
                         });
                     });
                 }
@@ -251,92 +246,80 @@
     });
 }
 
-- (void)addAudioreaderWith:(CFTimeInterval)elapsed and:(void(^)(void))completionBlock
+- (void)addAudioreaderWith:(CFTimeInterval)elapsed and:(void(^)(NSError *))completionBlock
 {
     if (self.option.inputAudioURL == nil) {
         if (completionBlock) {
-            completionBlock();
+            completionBlock(nil);
         }
         return;
     }
     
-    CFTimeInterval audioTime = 0;
     AVAsset *audioAsset = [AVAsset assetWithURL:[NSURL fileURLWithPath:self.option.inputAudioURL]];
     AVAssetTrack *audioAssetTrack = [audioAsset tracksWithMediaType:AVMediaTypeAudio].firstObject;
-    CFTimeInterval audioAssetTime = 0.0;
-    if (audioAsset.duration.timescale != 0) {
-        audioAssetTime = audioAsset.duration.value/audioAsset.duration.timescale;
-    }
-    
-    audioTime = audioAssetTime;
+    CFTimeInterval audioAssetTime = CMTimeGetSeconds(audioAsset.duration);
     
     NSInteger outputCount = 1;
-    if (audioTime > 0) {
-        outputCount = ceil(elapsed / (CGFloat)audioTime);
+    if (audioAssetTime > 0) {
+        outputCount = ceil(elapsed / audioAssetTime);
     }
     
     NSError *error = nil;
     AVAssetReader *assetReader = [[AVAssetReader alloc] initWithAsset:audioAsset error:&error];
-    self.audioReader = assetReader;
-    
     if (error) {
-        
         if (completionBlock) {
-            completionBlock();
+            completionBlock(error);
         }
-        
         return;
     }
-    
     AVAssetReaderTrackOutput *audioAssetTrackOutput = [[AVAssetReaderTrackOutput alloc] initWithTrack:audioAssetTrack outputSettings:nil];
-    
     if([assetReader canAddOutput:audioAssetTrackOutput])
     {
         [assetReader addOutput:audioAssetTrackOutput];
-        
         if (outputCount - 1 > 0) {
             for (NSInteger i = 0; i < (outputCount - 1); i ++) {
                 AVAssetReaderTrackOutput *assetTrackOutput = [[AVAssetReaderTrackOutput alloc] initWithTrack:audioAssetTrack outputSettings:nil];
                 [assetReader addOutput:assetTrackOutput];
             }
         }
-        
-        [assetReader startReading];
-        
-        dispatch_group_t encodingGroup = dispatch_group_create();
-        
-        dispatch_group_enter(encodingGroup);
-        __block  NSInteger assetTrackOutputIndex = 0;
-        @weakify(self);
-        [self.audioWriterInput requestMediaDataWhenReadyOnQueue:self.render_queue usingBlock:^{
-            @strongify(self);
-            while ([self.audioWriterInput isReadyForMoreMediaData])
+    }
+    [assetReader startReading];
+    
+    @weakify(self);
+    __block  NSInteger assetTrackOutputIndex = 0;
+    [self.audioWriterInput requestMediaDataWhenReadyOnQueue:self.append_pixelBuffer_queue usingBlock:^{
+        @strongify(self);
+        while ([self.audioWriterInput isReadyForMoreMediaData])
+        {
+            AVAssetReaderTrackOutput *trackOutput = (AVAssetReaderTrackOutput *)assetReader.outputs[assetTrackOutputIndex];
+            CMSampleBufferRef nextSampleBuffer = [trackOutput copyNextSampleBuffer];
+            if (nextSampleBuffer && assetReader.status == AVAssetReaderStatusReading)
             {
-                AVAssetReaderTrackOutput *trackOutput = (AVAssetReaderTrackOutput *)assetReader.outputs[assetTrackOutputIndex];
-                
-                CMSampleBufferRef nextSampleBuffer = [trackOutput copyNextSampleBuffer];
-                
-                if (nextSampleBuffer)
-                {
-                    [self.audioWriterInput appendSampleBuffer:nextSampleBuffer];
-                    CFRelease(nextSampleBuffer);
-                }
-                else if (assetTrackOutputIndex < outputCount -1)
-                {
-                    assetTrackOutputIndex ++;
-                }
-                else
-                {
+                BOOL result = [self.audioWriterInput appendSampleBuffer:nextSampleBuffer];
+                CFRelease(nextSampleBuffer);
+                if (!result) {
+                    LMQLog(@"出错");
                     [self.audioWriterInput markAsFinished];
-                    dispatch_group_leave(encodingGroup);
+                    [assetReader cancelReading];
                     if (completionBlock) {
-                        completionBlock();
+                        completionBlock([NSError errorWithDomain:@"Write audio error!" code:400 userInfo:nil]);
                     }
                     break;
                 }
             }
-        }];
-    }
+            else if (assetTrackOutputIndex < outputCount -1){
+                assetTrackOutputIndex ++;
+            }else
+            {
+                [self.audioWriterInput markAsFinished];
+                [assetReader cancelReading];
+                if (completionBlock) {
+                    completionBlock(nil);
+                }
+                break;
+            }
+        }
+    }];   
 }
 
 #pragma mark - tools
@@ -409,9 +392,8 @@
 - (dispatch_queue_t)render_queue
 {
     if (!_render_queue) {
-        _render_queue = dispatch_queue_create("LMQScreenRecorder.render_queue", DISPATCH_QUEUE_CONCURRENT);
-//        dispatch_set_target_queue(_render_queue, dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_HIGH, 0));
-
+        _render_queue = dispatch_queue_create("LMQScreenRecorder.render_queue", DISPATCH_QUEUE_SERIAL);
+        dispatch_set_target_queue(_render_queue, dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_HIGH, 0));
     }
     return _render_queue;
 }
@@ -424,25 +406,18 @@
     return _append_pixelBuffer_queue;
 }
 
-- (dispatch_semaphore_t)semaphore
-{
-    if (!_semaphore) {
-        _semaphore = dispatch_semaphore_create(1);
-    }
-    return _semaphore;
-}
-
-
 - (void)clean
 {
-  
+    self.videoWriter = nil;
+    self.avAdaptor = nil;
+    self.audioWriterInput = nil;
+    self.videoWriterInput = nil;
 }
 
 - (void)dealloc
 {
     self.recordView = nil;
     self.completionBlock = nil;
-    _semaphore = nil;
     _render_queue = nil;
     _append_pixelBuffer_queue = nil;
 }

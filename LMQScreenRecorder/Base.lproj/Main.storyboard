@@ -33,9 +33,21 @@
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dTS-Di-Ywh">
                                 <rect key="frame" x="16" y="20" width="288" height="288"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="u9D-NL-Nec">
+                                        <rect key="frame" x="0.0" y="0.0" width="288" height="288"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="50"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
+                                    <constraint firstItem="u9D-NL-Nec" firstAttribute="leading" secondItem="dTS-Di-Ywh" secondAttribute="leading" id="2F4-5R-8o7"/>
+                                    <constraint firstAttribute="bottom" secondItem="u9D-NL-Nec" secondAttribute="bottom" id="4Lj-vX-mgX"/>
                                     <constraint firstAttribute="width" secondItem="dTS-Di-Ywh" secondAttribute="height" multiplier="240:240" id="B33-a2-KMY"/>
+                                    <constraint firstItem="u9D-NL-Nec" firstAttribute="top" secondItem="dTS-Di-Ywh" secondAttribute="top" id="G83-4P-Z08"/>
+                                    <constraint firstAttribute="trailing" secondItem="u9D-NL-Nec" secondAttribute="trailing" id="YVl-mg-uE5"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -50,6 +62,7 @@
                     </view>
                     <connections>
                         <outlet property="colorView" destination="dTS-Di-Ywh" id="ufP-AZ-0hf"/>
+                        <outlet property="numLabel" destination="u9D-NL-Nec" id="8lL-u2-7h9"/>
                         <outlet property="recoderBtn" destination="Enl-1g-5Vu" id="NUy-kH-6w5"/>
                     </connections>
                 </viewController>
